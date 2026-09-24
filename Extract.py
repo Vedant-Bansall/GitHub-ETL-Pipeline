@@ -1,8 +1,6 @@
-import os
 from datetime import datetime, timezone
 
 import requests
-from dotenv import load_dotenv
 
 
 class ExtractionError(Exception):
@@ -21,18 +19,7 @@ class ServerIssueError(ExtractionError):
         super().__init__(self.message)
 
 ### Extract
-# Load values
-load_dotenv()
-
-# Get create variables
-pat_key = os.getenv("GITHUB_TOKEN")
-owner = "pallets"
-repo = "flask"
-username = "Vedant-Bansall"
-target_date_str = "2026-09-01T00:00:00Z"
-target_dt = datetime.fromisoformat(target_date_str.replace("Z", "+00:00"))
-
-def extract_data(key, owner, repo, username, target_date_str, target_dt):
+def extract_data(key: str, owner: str, repo: str, username: str, target_date_str: str, target_dt: datetime) -> tuple[list, list]:
     ## Issues
     # Create Response params
     url = f"https://api.github.com/repos/{owner}/{repo}/issues"
