@@ -1,2 +1,4 @@
 .env
 .venv/
+__pychache__/
+__pycache__/Extract.cpython-314.pyc

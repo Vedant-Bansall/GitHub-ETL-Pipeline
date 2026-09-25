@@ -1,8 +1,10 @@
+# Imports
 from datetime import datetime, timezone
 
 import requests
 
 
+# Custom Errors
 class ExtractionError(Exception):
     def __init__(self, message):
         self.message = message
@@ -26,8 +28,10 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
     headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {key}", "User-Agent": username}
     query_paramaters = {"since": target_date_str, "state": "all", "per_page": 100}
 
+    # List of all
     master_list = []
 
+    # Pagination Loop 1 - Std Issues
     while url != None:
         try:
             # Create Response
@@ -56,6 +60,7 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
             else:
                 raise ExtractionError("You have no more requests remaining or a serverside error happened")
 
+        # Raise Errors:
         except requests.exceptions.HTTPError as e:
             status = e.response.status_code if e.response is not None else "Unknown"
             if status in [403, 429]:
@@ -67,12 +72,13 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
         except requests.exceptions.RequestException:
             raise ServerIssueError("Serverside Error")
 
-        query_paramaters = None
+        query_paramaters = None # Reset params
 
-        master_list.extend(response_json)
+        master_list.extend(response_json) # Add to all
 
         link = response.headers.get("Link")
 
+        # Link parsing
         if link != None:
             link_parsed = requests.utils.parse_header_links(str(link))
             link_found = None
@@ -89,11 +95,13 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
     standard_issues = [item for item in master_list if item.get("pull_request") is None]
 
     ## Pull Requests
+    # New response params
     pull_url = f"https://api.github.com/repos/{owner}/{repo}/pulls"
     pull_query_paramaters = {"state": "all", "per_page": 100, "sort": "updated", "direction": "desc"}
 
     pull_list = []
 
+    # Pagination Loop 2 - Pull Requests
     while pull_url != None:
         try:
             # Create Response
@@ -122,6 +130,7 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
             else:
                 raise ExtractionError("You have no more requests remaining or a serverside error happened")
 
+        # Raise Errors
         except requests.exceptions.HTTPError as e:
             status = e.response.status_code if e.response is not None else "Unknown"
             if status in [403, 429]:
@@ -133,8 +142,9 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
         except requests.exceptions.RequestException:
             raise ServerIssueError("Serverside Error")
 
-        pull_query_paramaters = None
+        pull_query_paramaters = None # Reset Params
 
+        # Get items from only AFTER the most recent occurence of script running
         for item in pull_response_json:
             raw_updated_at = item["updated_at"]
             item_dt = datetime.fromisoformat(raw_updated_at.replace("Z", "+00:00"))
@@ -147,6 +157,7 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
         if pull_url != None:
             pull_link = pull_response.headers.get("Link")
 
+            # Parsing
             if pull_link != None:
                 pull_link_parsed = requests.utils.parse_header_links(str(pull_link))
                 pull_link_found = None
@@ -167,4 +178,4 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
     if not master_list:
         raise ExtractionError("Extraction completed, but 0 issues/PRs matched the filter criteria.")
 
-    return standard_issues, pull_list
+    return standard_issues, pull_list # Returns items to be used
