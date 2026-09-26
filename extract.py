@@ -20,7 +20,7 @@ class ServerIssueError(ExtractionError):
         self.message = message
         super().__init__(self.message)
 
-### Extract
+# Extract Data
 def extract_data(key: str, owner: str, repo: str, username: str, target_date_str: str, target_dt: datetime) -> tuple[list, list]:
     ## Issues
     # Create Response params

@@ -1,22 +1,10 @@
 from __future__ import annotations
 
-import os
 from datetime import datetime
 
-from dotenv import load_dotenv
-from sqlalchemy import Column, ForeignKey, Table
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import Column, ForeignKey, Table, create_engine, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
 
-# Load values
-load_dotenv()
-
-# Get params, Not permanent
-pat_key = os.getenv("GITHUB_TOKEN")
-owner = "pallets"
-repo = "flask"
-username = "Vedant-Bansall"
-target_date_str = "2026-09-01T00:00:00Z"
-target_dt = datetime.fromisoformat(target_date_str.replace("Z", "+00:00"))
 
 # Base class
 class Base(DeclarativeBase):
@@ -63,5 +51,75 @@ class Label(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
 
-def load_data(data_structure: list):
-    pass
+# Load Data
+def load_data(dataset: list):
+    # Create Engine
+    engine = create_engine("sqlite:///data/data.db")
+
+    # Create Tables
+    Base.metadata.create_all(engine)
+
+    # Create Session
+    with Session(engine) as session:
+        for item in dataset:
+            # Updates if exists
+            existing_record = session.get(Record, item["id"])
+            if existing_record:
+                existing_record.number = item["number"]
+                existing_record.title = item["title"]
+                existing_record.author = item["author"]
+                existing_record.closed_by = item["closed_by"]
+                existing_record.thumbs_up = item["thumbs_up"]
+                existing_record.state = item["state"]
+                existing_record.body = item["body"]
+                existing_record.created_at = item["created_at"]
+                existing_record.closed_at = item["closed_at"]
+                existing_record.updated_at = item["updated_at"]
+                existing_record.merged_at = item["merged_at"]
+                existing_record.draft = item["draft"]
+                existing_record.head_branch = item["head_branch"]
+                existing_record.base_branch = item["base_branch"]
+                existing_record.lead_time_days = item["lead_time_days"]
+                existing_record.is_stale = item["is_stale"]
+                existing_record.entity_type = item["entity_type"]
+
+            # Inserts if new
+            else:
+                add_issue = Record(
+                    id=item["id"],
+                    number=item["number"],
+                    title=item["title"],
+                    author=item["author"],
+                    closed_by=item["closed_by"],
+                    thumbs_up=item["thumbs_up"],
+                    state=item["state"],
+                    body=item["body"],
+                    created_at=item["created_at"],
+                    closed_at=item["closed_at"],
+                    updated_at=item["updated_at"],
+                    merged_at=item["merged_at"],
+                    draft=item["draft"],
+                    head_branch=item["head_branch"],
+                    base_branch=item["base_branch"],
+                    lead_time_days=item["lead_time_days"],
+                    is_stale=item["is_stale"],
+                    entity_type=item["entity_type"]
+                )
+
+                session.add(add_issue)
+                existing_record = add_issue
+
+            # Add Labels
+            for l in item["labels"]:
+                stmt = select(Label).where(Label.name == l)
+                label = session.scalars(stmt).first()
+
+                if label is None:
+                    label_obj = Label(name=l)
+                    existing_record.labels.append(label_obj)
+
+                else:
+                    existing_record.labels.append(label)
+
+        # Commit session
+        session.commit()

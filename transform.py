@@ -2,6 +2,7 @@
 from datetime import datetime, timezone
 
 
+# Transform Data
 def transform_data(issue_list: list, pr_list: list) -> list:
     # Transformed Issues Data, flattened and filtered out, easier readability and better for analysis
     transformed_issues = []
