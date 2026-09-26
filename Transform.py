@@ -1,26 +1,8 @@
 # Imports
-import os
 from datetime import datetime, timezone
 
-from dotenv import load_dotenv
 
-from Extract import extract_data
-
-# Load values
-load_dotenv()
-
-# Get params
-pat_key = os.getenv("GITHUB_TOKEN")
-owner = "pallets"
-repo = "flask"
-username = "Vedant-Bansall"
-target_date_str = "2026-09-01T00:00:00Z"
-target_dt = datetime.fromisoformat(target_date_str.replace("Z", "+00:00"))
-
-def transform_data():
-    # Access the data
-    issue_list, pr_list = extract_data(pat_key, owner, repo, username, target_date_str, target_dt)
-
+def transform_data(issue_list: list, pr_list: list) -> list:
     # Transformed Issues Data, flattened and filtered out, easier readability and better for analysis
     transformed_issues = []
 
@@ -55,7 +37,7 @@ def transform_data():
         issue_lead_time_days = (issue_closed_dt - issue_created_dt).total_seconds() / 86400 if issue_closed_dt and issue_created_dt else None
 
         # Stale Flag
-        issue_is_stale = (datetime.now(timezone.utc) - issue_updated_dt).days > 14 if issue_updated_dt else False
+        issue_is_stale = (datetime.now(timezone.utc) - issue_updated_dt).days > 15 if issue_updated_dt else False
 
         # Label Assignment
         issue_labels = [label["name"] for label in issue.get("labels") or []]
