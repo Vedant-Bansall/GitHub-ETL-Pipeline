@@ -1,3 +1,4 @@
+# Imports
 from __future__ import annotations
 
 import os
@@ -125,6 +126,11 @@ def load_data(dataset: list):
 
         # Commit session
         session.commit()
+
+    # Make most recent run time
+    with open("timestamp.txt", "w") as tstxt:
+        ts = datetime.now(timezone.utc)
+        tstxt.write(ts.isoformat())
 
 # Load data as parquet file
 def data_to_parquet(dataset):
