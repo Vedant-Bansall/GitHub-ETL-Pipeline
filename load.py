@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
+import os
+from datetime import datetime, timezone
 
+import pandas as pd
 from sqlalchemy import Column, ForeignKey, Table, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
 
@@ -123,3 +125,20 @@ def load_data(dataset: list):
 
         # Commit session
         session.commit()
+
+# Load data as parquet file
+def data_to_parquet(dataset):
+    # DataFrame
+    df = pd.DataFrame(dataset)
+
+    # Getting Timestamp as format
+    ts = datetime.now(timezone.utc)
+    tsft = ts.strftime("%Y-%m-%d_%H.%M.%S")
+
+    # Making path
+    pq_dir_path = "data/parquet"
+    filename = f"github_data-_{tsft}.parquet"
+    combined_path = os.path.join(pq_dir_path, filename)
+
+    # Export to parquet
+    df.to_parquet(combined_path)

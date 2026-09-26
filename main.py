@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from extract import extract_data
 from transform import transform_data
-from load import load_data
+from load import load_data, data_to_parquet
 
 # Load values
 load_dotenv()
@@ -20,4 +20,4 @@ target_dt = datetime.fromisoformat(target_date_str.replace("Z", "+00:00"))
 
 standard_issues, pull_requests = extract_data(pat_key, owner, repo, username, target_date_str, target_dt)
 transformed_dataset = transform_data(standard_issues, pull_requests)
-print(load_data(transformed_dataset))
+data_to_parquet(transformed_dataset)
