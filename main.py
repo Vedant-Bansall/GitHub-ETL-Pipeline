@@ -16,7 +16,7 @@ owner = "pallets"
 repo = "flask"
 username = "Vedant-Bansall"
 if os.path.getsize("timestamp.txt") == 0:
-    target_date_str = "2008-01-01T00:00:00Z"
+    target_date_str = "2008-01-01T00:00:00Z" # If you wouild like to configure initial run date yourself, the format is YYYY-MM-DDTHH:MM:SSZ and do not remove the T and Z, they must be there
 else:
     with open("timestamp.txt") as tstxt:
         target_date_str = tstxt.read()
