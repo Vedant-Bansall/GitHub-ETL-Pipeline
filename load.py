@@ -143,7 +143,7 @@ def data_to_parquet(dataset):
 
     # Making path
     pq_dir_path = "data/parquet"
-    filename = f"github_data-_{tsft}.parquet"
+    filename = f"github_data_{tsft}.parquet"
     combined_path = os.path.join(pq_dir_path, filename)
 
     # Export to parquet

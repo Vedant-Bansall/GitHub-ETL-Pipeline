@@ -24,7 +24,11 @@ else:
 target_dt = datetime.fromisoformat(target_date_str.replace("Z", "+00:00"))
 
 standard_issues, pull_requests = extract_data(pat_key, owner, repo, username, target_date_str, target_dt)
-transformed_dataset = transform_data(standard_issues, pull_requests)
-load_data(transformed_dataset)
-data_to_parquet(transformed_dataset)
-print(f"Fetched:\n• {len(standard_issues)} Issues\n• {len(pull_requests)} Pull Requests")
+if standard_issues or pull_requests:
+    transformed_dataset = transform_data(standard_issues, pull_requests)
+    load_data(transformed_dataset)
+    data_to_parquet(transformed_dataset)
+    print(f"Fetched:\n• {len(standard_issues)} Issues\n• {len(pull_requests)} Pull Requests")
+
+else:
+    print("Extraction completed, but 0 issues/PRs matched the filter criteria.")

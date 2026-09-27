@@ -4,3 +4,4 @@ __pycache__/
 data/data.db
 data/parquet/*.parquet
 !data/parquet.*.gitkeepgit
+timestamp.txt

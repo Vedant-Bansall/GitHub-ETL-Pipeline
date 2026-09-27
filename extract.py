@@ -174,8 +174,4 @@ def extract_data(key: str, owner: str, repo: str, username: str, target_date_str
         else:
             pull_url = None
 
-    # Seperate items
-    if not master_list:
-        raise ExtractionError("Extraction completed, but 0 issues/PRs matched the filter criteria.")
-
     return standard_issues, pull_list # Returns items to be used
