@@ -2,6 +2,9 @@
 This is an ETL Pipeline. What my somewhat simple code does is it extracts issues and pull requests updated/created after the script last ran (Fallback is at the very start of repo creation), flattens it into readable columns of important data like: dates, information and labels then exports it as a columnar-based parquet file and into a permanent database of all times it has ran.
 The parquet files will be used for data analysis.
 
+This is useful as you can see historical growth, find bottlenecks, see team efficiency, analyse key metrics and just see overall repository health.
+This project is only useful for a singular repo but my next project expands on this, making it able to analyse multiple repos in the same fashion
+
 ## Setup
 To set up this repo correctly, follow these steps:
 - In the repo, create and activate a virtual environment so you can run some scripts in it. To create a venv run these commands in the following order:
@@ -11,7 +14,7 @@ To set up this repo correctly, follow these steps:
     4. pip install -r requirements.txt
 - In the .env.example file in the repo, please add your personal access token. Example: GITHUB_TOKEN=MySecretToken and rename the file to .env
 - To see how to create a PAT, [click here](https://www.youtube.com/watch?v=0C-B6bFuQYU)
-- In main.py, assign these variables to your liking:
+- In main.py, assign these variables to your liking (**NOTE: I DO NOT OWN PALLET/FLASK NOR HAVE I HELPED IT, IT WAS PURELY USED AS A TEST REPO**):
     * owner (the person who owns the target repo)
     * repo (the target repo name)
     * username (Your GitHub Username)
