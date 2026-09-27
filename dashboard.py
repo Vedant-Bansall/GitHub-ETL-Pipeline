@@ -31,7 +31,7 @@ def load_data(file_path):
 # Get all records of parquet files
 @st.cache_data
 def get_all_records():
-    df = duckdb.sql("SELECT *, filename FROM read_parquet('data/parquet/*.parquet', filename=True)").df() # Create DF of all parquet records
+    df = duckdb.sql("SELECT *, filename FROM read_parquet('data/parquet/*.parquet', filename=True, union_by_name=True)").df() # Create DF of all parquet records
     df["snapshot_time"] = df["filename"].str.extract(r'(\d{4}-\d{2}-\d{2}_\d{2}\.\d{2}\.\d{2})') # Regex Timestamp and create column
     df["snapshot_time"] = pd.to_datetime(df["snapshot_time"], format="%Y-%m-%d_%H.%M.%S") # Create Datetime object
     return df # Return DF
