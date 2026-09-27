@@ -32,7 +32,4 @@ To set up this repo correctly, follow these steps:
 IF you use this, please make sure you have everything correctly set up (every single file in the repo) and DO NOT TOUCH THEM OR IT BREAKS THE SCRIPT (Esepcially timestamp.txt and data.db)
 
 ## Next plans
-- **Tag adder:** Adds relevant tags to specific issues and an slack channel bot to tell you what happens every time it is ran
-- **Docking Containment:** This will be on a docker container so it can be run on any system (WIP Currently)
-- **AI Summary:** An AI will make a 2 sentence summary of the title and body of the issues/PRs and create a suggested team assignement
 - **Multi Repo:** Currently, this only works on one repo but I plan on making a separate repo to make this work on many repos, this will be at the very end however!
