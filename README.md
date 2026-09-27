@@ -2,6 +2,16 @@
 This is an ETL Pipeline. What my somewhat simple code does is it extracts issues and pull requests updated/created after the script last ran (Fallback is at the very start of repo creation), flattens it into readable columns of important data like: dates, information and labels then exports it as a columnar-based parquet file and into a permanent database of all times it has ran.
 The parquet files will be used for data analysis.
 
+## Setup
+To set up this repo correctly, follow these steps:
+- In the repo, create and activate a virtual environment so you can run some scripts in it. Once activated, please run pip install -r requirements.txt
+- In the .env file in the repo, please add your personal access token. Example: GITHUB_TOKEN=MySecretToken
+- In main.py, assign these variables to your liking:
+    * owner (the person who owns the target repo)
+    * repo (the target repo name)
+    * username (Your GitHub Username)
+- Run main.py to finish and use the script
+
 ### Warning
 IF you use this, please make sure you have everything correctly set up (every single file in the repo) and DO NOT TOUCH THEM (Esepcially timestamp.txt and data.db)
 
