@@ -19,10 +19,14 @@ def get_latest_parquet_path():
 @st.cache_data
 def load_data(file_path):
     connection = duckdb.connect(database=':memory:')
-    query = f"SELECT * FROM '{file_path}'"
+    query = f"SELECT *, '{file_path}' as filename FROM '{file_path}'"
     df = connection.execute(query).df()
     connection.close()
-    return df
+    
+    # Extract snapshot_time
+    df["snapshot_time"] = df["filename"].str.extract(r'(\d{4}-\d{2}-\d{2}_\d{2}\.\d{2}\.\d{2})') # Regex Timestamp
+    df["snapshot_time"] = pd.to_datetime(df["snapshot_time"], format="%Y-%m-%d_%H.%M.%S") # Convert to Datetime
+    return df # Return DF
 
 # Get all records of parquet files
 @st.cache_data
@@ -50,8 +54,14 @@ def main():
 
         # Sidebar creation
         with st.sidebar:
-            selected_authors = st.multiselect("Select Authors", options=df["author"].unique())
-            search_term = st.text_input("Search Titles")
+            selected_authors = st.multiselect("Select Authors", options=df["author"].unique()) # Select authors
+            selected_entity = st.multiselect("Select Entity Type", default=df_all["entity_type"].unique(), options=df_all["entity_type"].unique()) # Select Entity Type
+            search_term = st.text_input("Search Titles") # Search for title
+            # Search by time
+            df_all["snapshot_time"] = pd.to_datetime(df_all["snapshot_time"]) # Convert to datetime
+            min_date = df_all["snapshot_time"].min().date()
+            max_date = df_all["snapshot_time"].max().date()
+            selected_dates = st.sidebar.date_input("Filter via date", value=(min_date, max_date), min_value=min_date, max_value=max_date) # Create the date input
 
         # Filtering selected authors/topics
         filtered_df = df.copy()
@@ -63,6 +73,18 @@ def main():
         # Filtering selected topics
         if search_term:
             filtered_df = filtered_df[filtered_df["title"].str.contains(search_term, case=False, na=False)]
+
+        # Filtering issues/PRs
+        if selected_entity:
+            filtered_df = filtered_df[filtered_df["entity_type"].isin(selected_entity)]
+
+        # Filters dates
+        if len(selected_dates) == 2:
+            start_date, end_date = selected_dates
+            filtered_df = filtered_df[filtered_df["snapshot_time"].dt.date.between(start_date, end_date)]
+
+        elif len(selected_dates) == 1:
+            filtered_df = filtered_df[filtered_df["snapshot_time"].dt.date == selected_dates[0]]
 
         # Creating KPI Cards
         col1, col2, col3 = st.columns(3)
@@ -120,14 +142,29 @@ def main():
             st.plotly_chart(histogram_fig, use_container_width=True)
 
         # Total Issue/PR over time
-        trend_df = df_all.groupby(["snapshot_time", "entity_type"]).size().reset_index(name="count")
-        fig_trend = px.line(trend_df,
-                            x="snapshot_time",
-                            y="count",
-                            color="entity_type",
-                            markers=True,
-                            title="Issues and PRs Over Time")
-        st.plotly_chart(fig_trend, use_container_width=True)
+        if selected_entity:
+            filtered_df_all = df_all[df_all["entity_type"].isin(selected_entity)]
+
+            # Filters dates
+            if len(selected_dates) == 2:
+                start_date, end_date = selected_dates
+                filtered_df_all = filtered_df_all[filtered_df_all["snapshot_time"].dt.date.between(start_date, end_date)]
+
+            elif len(selected_dates) == 1:
+                filtered_df_all = filtered_df_all[filtered_df_all["snapshot_time"].dt.date == selected_dates[0]]
+
+            trend_df = filtered_df_all.groupby(["snapshot_time", "entity_type"]).size().reset_index(name="count")
+
+            fig_trend = px.line(trend_df,
+                                x="snapshot_time",
+                                y="count",
+                                color="entity_type",
+                                markers=True,
+                                title="Issues and PRs Over Time")
+            st.plotly_chart(fig_trend, use_container_width=True)
+
+        else:
+            st.warning("Please select at least one entity type")
 
         # View raw data
         with st.expander("View Raw Data"):

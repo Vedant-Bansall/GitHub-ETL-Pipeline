@@ -18,14 +18,21 @@ To set up this repo correctly, follow these steps:
 - Run main.py to finish and use the script
 - What happens is it extracts your data, flattens it into relevant data, then loads it into a permanent database of every record and a new parquet file (this creates a new file each time so it can see the most recent snapshot of data)
 - After this runs, run dashboard.py (optional) to see the dashboard of analytics
+- These analytics includes KPI cards and graphs of:
+    * Total Issues recorded
+    * Amount of different users who have contributed
+    * Amount of Stale Items (> 14 days of inactivity)
+    * Closed to Open ration Pie Chart
+    * Amount of entities (issues/PRs) an author has made
+    * A bar chart of amount of each label
+    * A Histogram of lead time days to see how long it takes to close an issue
+    * Total Issue/PR over time (Records per snapshot)
 
 ### Warning
 IF you use this, please make sure you have everything correctly set up (every single file in the repo) and DO NOT TOUCH THEM OR IT BREAKS THE SCRIPT (Esepcially timestamp.txt and data.db)
 
 ## Next plans
 - **Tag adder:** Adds relevant tags to specific issues and an slack channel bot to tell you what happens every time it is ran
-- **Web App:** Streamlit/Dash Dashboard of Interactive charts and graphs with a few leaderboards (WIP Currently)
-- **DuckDB Analysis:** Runs fast SQL Queries on .parquet files to run historical queries without effecting the actual database itself (WIP Currently)
-- **Docking Containment:** This will be on a docker container so it can be run on any system
+- **Docking Containment:** This will be on a docker container so it can be run on any system (WIP Currently)
 - **AI Summary:** An AI will make a 2 sentence summary of the title and body of the issues/PRs and create a suggested team assignement
 - **Multi Repo:** Currently, this only works on one repo but I plan on making a separate repo to make this work on many repos, this will be at the very end however!
